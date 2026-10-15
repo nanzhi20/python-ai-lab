@@ -1,0 +1,82 @@
+[
+  {
+    "question": "LanShare主要解决什么问题？",
+    "expected_section": "项目目的"
+  },
+  {
+    "question": "不使用微信，手机和电脑之间还能怎样传递少量信息？",
+    "expected_section": "项目目的"
+  },
+  {
+    "question": "手机应该输入什么地址才能打开LanShare？",
+    "expected_section": "访问方式"
+  },
+  {
+    "question": "生成访问二维码需要调用第三方二维码服务吗？",
+    "expected_section": "访问方式"
+  },
+  {
+    "question": "连续上传两个名称相同的文件，前一个会被替换吗？",
+    "expected_section": "文件共享"
+  },
+  {
+    "question": "关闭服务重新启动后，之前上传的文件还存在吗？",
+    "expected_section": "文件共享"
+  },
+  {
+    "question": "一台设备删除共享文字后，其他设备看到的内容会变化吗？",
+    "expected_section": "文字共享"
+  },
+  {
+    "question": "程序会定期自动清除以前分享的文字和文件吗？",
+    "expected_section": "文字共享"
+  },
+  {
+    "question": "页面自动更新文字列表时，会不会清空正在输入的长文本？",
+    "expected_section": "自动刷新"
+  },
+  {
+    "question": "如何避免上一次刷新没有结束就发起下一次刷新？",
+    "expected_section": "自动刷新"
+  },
+  {
+    "question": "项目有没有独立前端工程和数据库？",
+    "expected_section": "技术结构"
+  },
+  {
+    "question": "LanShare可以直接部署到公网供大量用户使用吗？",
+    "expected_section": "安全与性能限制"
+  },
+  {
+    "question": "系统是否限制上传速率、文件总数和存储空间？",
+    "expected_section": "安全与性能限制"
+  },
+  {
+    "question": "用户忘记密码后应该怎样找回？",
+    "expected_section": null
+  },
+  {
+  "question": "电脑关机再开以后，昨天传上去的照片还能找到吗？",
+  "expected_section": "文件共享"
+  },
+  {
+    "question": "先后发送两份名称一样的内容，早先那份会被顶掉吗？",
+    "expected_section": "文件共享"
+  },
+  {
+    "question": "朋友拿起手机后，应该在地址栏输入哪一串内容？",
+    "expected_section": "访问方式"
+  },
+  {
+    "question": "我正在编辑一大段内容，后台更新会让尚未提交的东西消失吗？",
+    "expected_section": "自动刷新"
+  },
+  {
+    "question": "这个工具适合在咖啡店的公共 Wi-Fi 中开启吗？",
+    "expected_section": "安全与性能限制"
+  },
+  {
+    "question": "家里另一台设备移除了一条便签，我这里还能继续看到它吗？",
+    "expected_section": "文字共享"
+  }
+]
