@@ -13,3 +13,6 @@ wheels/
 
 data/sqlite_demo.db
 data/sqlite_demo.db-*
+
+data/chroma_demo/
+data/chroma_db/
