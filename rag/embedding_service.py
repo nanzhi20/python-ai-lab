@@ -47,5 +47,5 @@ class EmbeddingService:
         ):
             raise ValueError("文档不能为空")
 
-        documents_embeddings = self._model.encode(documents, normalize_embeddings=True)
+        documents_embeddings = self._model.encode(normalized_documents, normalize_embeddings=True)
         return documents_embeddings.tolist()
