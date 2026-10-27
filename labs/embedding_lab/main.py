@@ -1,5 +1,5 @@
 import numpy as np
-from labs.embedding_lab.embedding_service import  EmbeddingService
+from rag.embedding_service import  EmbeddingService
 
 def cosine_similarity(first_embedding, second_embedding) -> float:
     first_length = np.linalg.norm(first_embedding)

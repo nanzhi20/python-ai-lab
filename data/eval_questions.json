@@ -78,5 +78,41 @@
   {
     "question": "家里另一台设备移除了一条便签，我这里还能继续看到它吗？",
     "expected_section": "文字共享"
+  },
+  {
+    "question": "Python中的列表应该怎样排序？",
+    "expected_section": null
+  },
+  {
+    "question": "明天北京的天气怎么样？",
+    "expected_section": null
+  },
+  {
+    "question": "高铁票应该在哪里购买？",
+    "expected_section": null
+  },
+  {
+    "question": "一碗米饭大约有多少热量？",
+    "expected_section": null
+  },
+  {
+    "question": "一元二次方程应该怎样求解？",
+    "expected_section": null
+  },
+  {
+    "question": "感冒以后应该服用什么药物？",
+    "expected_section": null
+  },
+  {
+    "question": "手机电池不耐用应该怎么办？",
+    "expected_section": null
+  },
+  {
+    "question": "唐朝的都城位于哪里？",
+    "expected_section": null
+  },
+  {
+    "question": "股票价格上涨通常受哪些因素影响？",
+    "expected_section": null
   }
 ]
