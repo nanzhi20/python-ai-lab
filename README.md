@@ -9,6 +9,8 @@
 - 从本地 Markdown 文件读取知识资料
 - 按 Markdown 二级标题切分知识片段
 - 为知识片段生成稳定 ID 和内容哈希
+- 根据内容哈希和 Embedding 模型执行增量建库
+- 未发生变化时跳过模型加载和向量计算
 - 使用 `BAAI/bge-small-zh-v1.5` 生成本地文本向量
 - 为查询添加 BGE 中文检索指令，文档保持原文编码
 - 使用 Chroma 将文档、向量和 Metadata 持久化到本地
@@ -109,24 +111,30 @@ data/knowledge.md
     ↓
 生成KnowledgeChunk、稳定ID和内容哈希
     ↓
-使用BGE批量生成文档向量
+读取当前来源在Chroma中的Metadata
     ↓
-写入data/chroma_db中的Chroma Collection
+比较ID、content_hash和embedding_model
+    ├── 新增或发生变化：计算向量并upsert
+    ├── 完全未变化：跳过模型加载和向量计算
+    └── 已从文档删除：从Chroma中删除旧记录
 ```
 
-建库脚本使用 `upsert`：
+增量判断规则：
 
-- 新 ID 会被插入
-- 已存在 ID 会被更新
-- 已从当前知识文档移除的旧 ID 会被删除
-- 相同知识库重复建库不会不断增加记录数量
+- 数据库中没有相同 ID：新增片段并生成向量
+- ID 相同，但 `content_hash` 不同：正文已变化，重新生成向量
+- ID 相同，但 `embedding_model` 不同：模型已变化，重新生成向量
+- ID、内容哈希和模型均相同：保留原记录，不加载 Embedding 模型
+- 数据库中存在、当前来源中已不存在：删除过期记录
+
+脚本按 `source` 查询和清理记录，因此同步当前 `knowledge.md` 时不会误删其他来源的数据。每次运行会输出新增、更新、未变化、删除以及向量库总记录数。
 
 以下情况需要重新运行建库脚本：
 
 - 首次建立知识库
 - 修改了 `data/knowledge.md`
 - 修改了文档切分规则
-- 更换了 Embedding 模型
+- 更换为相同向量维度的 Embedding 模型
 - 删除了 `data/chroma_db/`
 
 ## 运行问答程序
@@ -247,7 +255,8 @@ data/sqlite_demo.db
 
 - 知识库来源目前只有一个 Markdown 文件
 - 文档切分只支持 Markdown 二级标题
-- 建库时仍会重新计算全部文档向量
+- 增量建库目前只处理单个 Markdown 来源文件
+- Chroma Collection 的向量维度固定；更换为不同维度的模型时，需要删除旧向量库或创建新 Collection 后完整重建
 - 距离阈值不能完全区分知识库内外问题
 - 评估集规模较小，结果不能代表通用性能
 - 仅支持单轮命令行问答
@@ -258,10 +267,11 @@ data/sqlite_demo.db
 
 ## 后续方向
 
-- 根据内容哈希实现增量向量更新
 - 增加更多知识库外评估问题
 - 分析 Hit@1 和 Hit@2 失败案例
 - 支持多个知识文档和来源过滤
 - 增加对 PDF、Word 等文件的解析
 - 增加多轮对话或流式输出
 - 为 RAG 结果增加引用展示
+
+
