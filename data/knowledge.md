@@ -22,7 +22,7 @@ LanShare 支持在局域网内添加、查看、复制和删除共享文字。�
 
 ## 技术结构
 
-项目后端使用 Spring Boot，前端使用内置的 HTML、CSS 和 JavaScript，没有单独创建前端工程，也没有使用数据库。后端主要分为 Controller 和 Service：Controller 接收浏览器请求并调用 Service，Service 负责文件、文字和本地存储等具体逻辑。数据保存在运行服务的电脑上，其他设备只是通过浏览器访问和操作这些数据。
+项目后端使用Spring Boot，前端使用内置的 HTML、CSS 和 JavaScript，没有单独创建前端工程，也没有使用数据库。后端主要分为 Controller 和 Service：Controller 接收浏览器请求并调用 Service，Service 负责文件、文字和本地存储等具体逻辑。数据保存在运行服务的电脑上，其他设备只是通过浏览器访问和操作这些数据。
 
 ## 安全与性能限制
 
