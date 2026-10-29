@@ -8,18 +8,63 @@ from rag.vector_store import (create_chroma_client, get_or_create_knowledge_coll
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-KNOWLEDGE_PATH = PROJECT_ROOT / 'data' / 'knowledge.md'
-KNOWLEDGE_NAME = KNOWLEDGE_PATH.name
+KNOWLEDGE_DIRECTORY = PROJECT_ROOT / 'data' / 'knowledge'
+
+
+def find_knowledge_files(
+        directory: Path
+) -> list[Path]:
+    if not directory.is_dir():
+        raise FileNotFoundError(
+            f"知识库目录不存在:{directory}"
+        )
+
+    files = sorted(
+        directory.rglob("*.md")
+    )
+    if not files:
+        raise ValueError(
+            f"知识库目录 {directory} 中没有Markdown文件"
+        )
+    return files
+
+
+def load_knowledge_chunks(
+        files: list[Path],
+        knowledge_directory: Path
+) -> list[KnowledgeChunk]:
+    chunks: list[KnowledgeChunk] = []
+    existing_ids: set[str] = set()
+
+    for file_path in files:
+        document = load_document(file_path)
+
+        source = file_path.relative_to(knowledge_directory).as_posix()
+
+        file_chunks = split_markdown_chunks(
+            text=document,
+            source=source
+        )
+        if not file_chunks:
+            raise ValueError(f"没有从知识文档 {file_path} 中切分出片段 ")
+
+        for chunk in file_chunks:
+            if chunk.id in existing_ids:
+                raise ValueError(
+                    f"检测到重复知识库片段:"
+                    f"source={chunk.source}"
+                    f"section={chunk.section}"
+                )
+            chunks.append(chunk)
+            existing_ids.add(chunk.id)
+
+    return chunks
 
 
 def load_existing_metadata(
         collection,
-        source: str
 ) -> dict[str, dict]:
     result = collection.get(
-        where={
-            "source": source,
-        },
         include=[
             'metadatas'
         ]
@@ -135,17 +180,15 @@ def delete_stale_chunks(
 
 
 def main():
-    document = load_document(KNOWLEDGE_PATH)
 
-    chunks = split_markdown_chunks(text=document, source=KNOWLEDGE_NAME)
+    files = find_knowledge_files(KNOWLEDGE_DIRECTORY)
 
-    if not chunks:
-        raise ValueError("没有从知识文档中切分出任何知识片段")
+    chunks = load_knowledge_chunks(files, KNOWLEDGE_DIRECTORY)
 
     client = create_chroma_client()
     collection = get_or_create_knowledge_collection(client)
 
-    existing_metadata = load_existing_metadata(collection, KNOWLEDGE_NAME)
+    existing_metadata = load_existing_metadata(collection)
 
     (chunks_to_upsert, new_count, updated_count, unchanged_count) \
         = select_chunks_to_upsert(chunks=chunks, existing_metadata=existing_metadata)
@@ -164,6 +207,7 @@ def main():
         current_ids=current_ids
     )
 
+    print(f"知识文档数量:{len(files)}")
     print(f"当前知识片段总数:{len(chunks)}")
     print(f"本次新增:{new_count}")
     print(f"本次更新:{updated_count}")

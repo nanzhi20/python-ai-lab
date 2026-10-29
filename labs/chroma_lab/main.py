@@ -37,15 +37,15 @@ def add_demo_records(collection):
         ],
         metadatas=[
             {
-                "source": "knowledge.md",
+                "source": "lanshare.md",
                 "section": "文件共享"
             },
             {
-                "source": "knowledge.md",
+                "source": "lanshare.md",
                 "section": "文字共享"
             },
             {
-                "source": "knowledge.md",
+                "source": "lanshare.md",
                 "section": "安全与性能限制"
             }
         ],
@@ -130,7 +130,7 @@ def run_crud_demo(collection):
         ],
         metadatas=[
             {
-                "source": "knowledge.md",
+                "source": "lanshare.md",
                 "section": "访问方式"
             }
         ],
@@ -151,7 +151,7 @@ def run_crud_demo(collection):
         ],
         metadatas=[
             {
-                "source": "knowledge.md",
+                "source": "lanshare.md",
                 "section": "访问方式",
                 "updated": True
             }

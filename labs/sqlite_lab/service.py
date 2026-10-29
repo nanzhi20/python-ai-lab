@@ -17,7 +17,7 @@ class KnowledgeChunkService:
         try:
             first_chunk = self._repository.insert(
                 content="文件保存在服务端本地目录中。",
-                source="knowledge.md",
+                source="lanshare.md",
                 section="文件共享",
             )
 
@@ -26,7 +26,7 @@ class KnowledgeChunkService:
 
             second_chunk = self._repository.insert(
                 content="二维码中保存的是访问地址。",
-                source="knowledge.md",
+                source="lanshare.md",
                 section="访问方式",
             )
 
