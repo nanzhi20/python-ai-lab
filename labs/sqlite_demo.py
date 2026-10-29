@@ -166,7 +166,7 @@ def insert_two_chunks(
             """,
             (
                 "文件保存在服务端本地目录中。",
-                "knowledge.md",
+                "lanshare.md",
                 "文件共享"
             )
         )
@@ -181,7 +181,7 @@ def insert_two_chunks(
             """,
             (
                 "二维码中保存的是访问地址。",
-                "knowledge.md",
+                "lanshare.md",
                 "访问方式"
             )
         )

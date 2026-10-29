@@ -6,10 +6,12 @@
 
 ## 当前功能
 
-- 从本地 Markdown 文件读取知识资料
+- 递归读取本地目录中的多个 Markdown 知识文档
 - 按 Markdown 二级标题切分知识片段
 - 为知识片段生成稳定 ID 和内容哈希
+- 使用文档相对路径记录片段来源
 - 根据内容哈希和 Embedding 模型执行增量建库
+- 支持新增、修改和删除整个知识文档后的向量同步
 - 未发生变化时跳过模型加载和向量计算
 - 使用 `BAAI/bge-small-zh-v1.5` 生成本地文本向量
 - 为查询添加 BGE 中文检索指令，文档保持原文编码
@@ -40,7 +42,9 @@
 ```text
 python-ai-lab/
 ├── data/
-│   ├── knowledge.md          # LanShare 知识库原文
+│   ├── knowledge/            # Markdown 知识库目录
+│   │   ├── lanshare.md       # LanShare 知识资料
+│   │   └── git.md            # Git 知识资料
 │   ├── eval_questions.json   # 检索评估问题
 │   └── chroma_db/            # Chroma 本地数据，不提交到Git
 ├── labs/
@@ -105,18 +109,20 @@ uv run python index_documents.py
 建库流程：
 
 ```text
-data/knowledge.md
+data/knowledge/**/*.md
     ↓
-按Markdown二级标题切分
+递归发现全部Markdown文档
     ↓
-生成KnowledgeChunk、稳定ID和内容哈希
+分别读取文档并按Markdown二级标题切分
     ↓
-读取当前来源在Chroma中的Metadata
+汇总全部KnowledgeChunk，生成稳定ID和内容哈希
+    ↓
+读取Collection中的全部Metadata
     ↓
 比较ID、content_hash和embedding_model
     ├── 新增或发生变化：计算向量并upsert
     ├── 完全未变化：跳过模型加载和向量计算
-    └── 已从文档删除：从Chroma中删除旧记录
+    └── 当前文档集合中已不存在：从Chroma中删除旧记录
 ```
 
 增量判断规则：
@@ -125,14 +131,16 @@ data/knowledge.md
 - ID 相同，但 `content_hash` 不同：正文已变化，重新生成向量
 - ID 相同，但 `embedding_model` 不同：模型已变化，重新生成向量
 - ID、内容哈希和模型均相同：保留原记录，不加载 Embedding 模型
-- 数据库中存在、当前来源中已不存在：删除过期记录
+- 数据库中存在、当前知识文档集合中已不存在：删除过期记录
 
-脚本按 `source` 查询和清理记录，因此同步当前 `knowledge.md` 时不会误删其他来源的数据。每次运行会输出新增、更新、未变化、删除以及向量库总记录数。
+每个知识片段使用 Markdown 文件相对于 `data/knowledge/` 的路径作为 `source`。因此不同文件中的同名章节可以生成不同 ID；同一文件中重复使用相同的二级标题则会触发重复 ID 检查。
+
+脚本会以 `data/knowledge/` 下当前存在的全部 Markdown 文档为准进行同步，因此删除整个知识文件后，其旧向量也会被清理。基于这一规则，`knowledge_chunks` Collection 应由 `index_documents.py` 独占管理，不应混入其他索引器写入的记录。每次运行会输出文档数量、片段总数以及新增、更新、未变化、删除和向量库总记录数。
 
 以下情况需要重新运行建库脚本：
 
 - 首次建立知识库
-- 修改了 `data/knowledge.md`
+- 新增、修改或删除了 `data/knowledge/` 下的 Markdown 文档
 - 修改了文档切分规则
 - 更换为相同向量维度的 Embedding 模型
 - 删除了 `data/chroma_db/`
@@ -253,9 +261,9 @@ data/sqlite_demo.db
 
 ## 当前限制
 
-- 知识库来源目前只有一个 Markdown 文件
 - 文档切分只支持 Markdown 二级标题
-- 增量建库目前只处理单个 Markdown 来源文件
+- 当前一个二级标题对应一个知识片段
+- 当前同步逻辑假定 `knowledge_chunks` Collection 由 `index_documents.py` 独占管理
 - Chroma Collection 的向量维度固定；更换为不同维度的模型时，需要删除旧向量库或创建新 Collection 后完整重建
 - 距离阈值不能完全区分知识库内外问题
 - 评估集规模较小，结果不能代表通用性能
@@ -269,7 +277,7 @@ data/sqlite_demo.db
 
 - 增加更多知识库外评估问题
 - 分析 Hit@1 和 Hit@2 失败案例
-- 支持多个知识文档和来源过滤
+- 支持多个相互隔离的知识库，或通过管理标记过滤不同来源
 - 增加对 PDF、Word 等文件的解析
 - 增加多轮对话或流式输出
 - 为 RAG 结果增加引用展示
